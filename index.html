@@ -17,18 +17,23 @@
           </p>
         <form id="myForm">
             <label>
-                <span>Ação 1:</span>
-                <input id="acao1" type="text" placeholder="Ação 1" required>
+                <span>Nome</span>
+                <input id="name" type="text" placeholder="Digite seu nome" required>
             </label>
 
             <label>
-                <span>Ação 2:</span>
-                <input id="acao2" type="text" placeholder="Ação 2" required>
+                <span>E-mail</span>
+                <input id="email" type="email" placeholder="Digite seu e-mail" required>
             </label>
 
             <label>
-                <span>Ação 3:</span>
-                <input id="acao3" type="text" placeholder="Ação 3" required>
+                <span>Senha</span>
+                <input id="password" type="password" placeholder="Digite sua senha" required>
+            </label>
+
+            <label>
+                <span>Confirme sua senha</span>
+                <input id="passwordConfirm" type="password" placeholder="Confirme sua senha" required>
             </label>
             <input type="submit" value="Cadastrar" />
         </form>
@@ -39,15 +44,17 @@
 
     <script>
         document.getElementById("myForm").addEventListener("submit", function(event){
-            event.preventDefault();
+            var password = document.getElementById("password").value;
+            var passwordConfirm = document.getElementById("passwordConfirm").value;
 
-           
-            var acao1 = document.getElementById("acao1").value;
-            var acao2 = document.getElementById("acao2").value;
-            var acao3 = document.getElementById("acao3").value;
-
-            
-            alert("Ação 1: " + acao1 + "\nAção 2: " + acao2 + "\nAção 3: " + acao3);
+            if (password !== passwordConfirm) {
+                alert("As senhas não são iguais. Por favor, verifique.");
+                event.preventDefault();
+            } else {
+                var name = document.getElementById("name").value;
+                var email = document.getElementById("email").value;
+                alert("Funcionário cadastrado com sucesso!\nNome: " + name + "\nE-mail: " + email);
+            }
         });
     </script>
 </body>

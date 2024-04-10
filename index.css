@@ -9,7 +9,6 @@ body {
 }
 
 footer {
-  position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
@@ -73,8 +72,6 @@ input::placeholder {
   color: #aaa;
 }
 
-.btn,
-button,
 input[type="submit"] {
   background-color: #0094f6;
   color: #fff;
@@ -91,12 +88,6 @@ input[type="submit"] {
   margin-top: 1em;
 }
 
-input:disabled {
-  cursor: not-allowed;
-  background-color: #000;
-}
-
-button:hover,
 input[type="submit"]:hover {
   opacity: 1;
 }
