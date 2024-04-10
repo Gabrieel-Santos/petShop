@@ -11,25 +11,44 @@
         <h1>Pet Shop</h1>
     </div>
     <div class="form-container">
-        <form action="">
+        <h2>Funcionário</h2>
+        <p className="subtitle">
+            Para cadastrar um funcionário, preencha os campos abaixo.
+          </p>
+        <form id="myForm">
             <label>
                 <span>Ação 1:</span>
-                <input type="text" placeholder="Ação 1">
+                <input id="acao1" type="text" placeholder="Ação 1" required>
             </label>
 
             <label>
-                <span>Ação 1:</span>
-                <input type="text" placeholder="Ação 1">
+                <span>Ação 2:</span>
+                <input id="acao2" type="text" placeholder="Ação 2" required>
             </label>
 
             <label>
-                <span>Ação 1:</span>
-                <input type="text" placeholder="Ação 1">
+                <span>Ação 3:</span>
+                <input id="acao3" type="text" placeholder="Ação 3" required>
             </label>
+            <input type="submit" value="Cadastrar" />
         </form>
     </div>
     <footer>
        <p>Pet Shop 2024 &copy; Todos os direitos reservados.</p>
     </footer>
+
+    <script>
+        document.getElementById("myForm").addEventListener("submit", function(event){
+            event.preventDefault();
+
+           
+            var acao1 = document.getElementById("acao1").value;
+            var acao2 = document.getElementById("acao2").value;
+            var acao3 = document.getElementById("acao3").value;
+
+            
+            alert("Ação 1: " + acao1 + "\nAção 2: " + acao2 + "\nAção 3: " + acao3);
+        });
+    </script>
 </body>
 </html>
