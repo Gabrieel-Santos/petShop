@@ -145,6 +145,20 @@ app.get("/tutors", authenticateToken, async (req, res) => {
   }
 });
 
+app.get("/tutors/all", authenticateToken, async (req, res) => {
+  try {
+    const tutors = await prisma.tutor.findMany({
+      include: {
+        pets: true,
+      },
+    });
+    res.json({ tutors });
+  } catch (error) {
+    console.error("Erro ao listar todos os tutores:", error);
+    res.status(400).json({ message: "Erro ao listar todos os tutores" });
+  }
+});
+
 // Rota para obter um tutor pelo ID
 app.get("/tutors/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
