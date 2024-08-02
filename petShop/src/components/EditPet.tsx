@@ -16,10 +16,23 @@ const EditPet: React.FC = () => {
     const fetchPetData = async () => {
       const token = localStorage.getItem("token");
       if (token) {
-        const response = await axios.get(`http://localhost:5000/pets/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setPetData(response.data);
+        try {
+          const response = await axios.get(`http://localhost:5000/pets/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (response.status === 200) {
+            const pet = response.data;
+            setPetData({
+              nome: pet.nome,
+              idade: pet.idade,
+              porte: pet.porte,
+              cpfTutor: pet.tutor.cpf,
+            });
+          }
+        } catch (error) {
+          console.error("Erro ao buscar dados do pet:", error);
+          alert("Erro ao buscar dados do pet");
+        }
       }
     };
 

@@ -7,7 +7,7 @@ import { PrismaClient } from "@prisma/client";
 
 const app = express();
 const prisma = new PrismaClient();
-const SECRET_KEY = "your_secret_key";
+const SECRET_KEY = process.env.SECRET_KEY;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -211,18 +211,19 @@ app.put("/tutors/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Rota para excluir um tutor pelo ID
+// Rota para excluir um tutor pelo ID e seus pets associados
 app.delete("/tutors/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
 
   try {
-    await prisma.tutor.delete({
-      where: { id: parseInt(id) },
-    });
-    res.json({ message: "Tutor excluído com sucesso" });
+    await prisma.$transaction([
+      prisma.pet.deleteMany({ where: { tutorId: parseInt(id) } }),
+      prisma.tutor.delete({ where: { id: parseInt(id) } }),
+    ]);
+    res.json({ message: "Tutor e seus pets excluídos com sucesso" });
   } catch (error) {
-    console.error("Erro ao excluir tutor:", error);
-    res.status(400).json({ message: "Erro ao excluir tutor" });
+    console.error("Erro ao excluir tutor e seus pets:", error);
+    res.status(400).json({ message: "Erro ao excluir tutor e seus pets" });
   }
 });
 
@@ -297,6 +298,28 @@ app.get("/pets/cpf/:cpf", authenticateToken, async (req, res) => {
   }
 });
 
+// Rota para obter um pet pelo ID
+app.get("/pets/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const pet = await prisma.pet.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        tutor: true, // Inclui os dados do tutor
+      },
+    });
+    if (!pet) {
+      return res.status(404).json({ message: "Pet não encontrado" });
+    }
+    res.json(pet);
+  } catch (error) {
+    console.error("Erro ao obter pet:", error);
+    res.status(400).json({ message: "Erro ao obter pet" });
+  }
+});
+
+// Rota para atualizar um pet pelo ID
 app.put("/pets/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { nome, idade, porte, cpfTutor } = req.body;
@@ -314,7 +337,7 @@ app.put("/pets/:id", authenticateToken, async (req, res) => {
       where: { id: parseInt(id) },
       data: {
         nome,
-        idade,
+        idade: parseInt(idade),
         porte,
         tutorId: tutor.id,
       },
@@ -326,6 +349,7 @@ app.put("/pets/:id", authenticateToken, async (req, res) => {
   }
 });
 
+// rota para excluir um pet pelo id
 app.delete("/pets/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
 
@@ -370,6 +394,59 @@ app.get("/funcionarios/email/:email", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error("Erro ao buscar funcionário por email:", error);
     res.status(400).json({ message: "Erro ao buscar funcionário por email" });
+  }
+});
+
+// Rota para buscar funcionário pelo ID
+app.get("/funcionarios/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const funcionario = await prisma.funcionario.findUnique({
+      where: { id: parseInt(id) },
+    });
+    res.json(funcionario);
+  } catch (error) {
+    console.error("Erro ao buscar funcionário por ID:", error);
+    res.status(400).json({ message: "Erro ao buscar funcionário por ID" });
+  }
+});
+
+// Rota para atualizar funcionário pelo ID
+app.put("/funcionarios/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { nome, email, autoridade, novaSenha } = req.body;
+
+  const data = { nome, email, autoridade };
+  if (novaSenha) {
+    const hashedPassword = await bcrypt.hash(novaSenha, 10);
+    data.senha = hashedPassword;
+  }
+
+  try {
+    const updatedFuncionario = await prisma.funcionario.update({
+      where: { id: parseInt(id) },
+      data,
+    });
+    res.json(updatedFuncionario);
+  } catch (error) {
+    console.error("Erro ao atualizar funcionário:", error);
+    res.status(400).json({ message: "Erro ao atualizar funcionário" });
+  }
+});
+
+// Rota para deletar funcionário pelo ID
+app.delete("/funcionarios/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await prisma.funcionario.delete({
+      where: { id: parseInt(id) },
+    });
+    res.json({ message: "Funcionário excluído com sucesso" });
+  } catch (error) {
+    console.error("Erro ao excluir funcionário:", error);
+    res.status(400).json({ message: "Erro ao excluir funcionário" });
   }
 });
 
