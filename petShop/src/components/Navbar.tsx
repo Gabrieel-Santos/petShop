@@ -21,6 +21,8 @@ const Navbar: React.FC = () => {
     navigate("/home");
   };
 
+  const roleLabel = userRole === 2 ? "Administrador" : "Funcionário";
+
   return (
     <nav className="bg-[#168479] text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
@@ -28,13 +30,14 @@ const Navbar: React.FC = () => {
           <img
             src="/login-logo.svg"
             alt="Logo"
-            className="h-12 w-12 cursor-pointer" // Aumentei o tamanho da logo
+            className="h-12 w-12 cursor-pointer"
             onClick={handleLogoClick}
           />
+          <span className="ml-2 px-3 py-1 border-2 border-purple-500 text-purple-500 rounded-full font-bold">
+            {roleLabel}
+          </span>
         </div>
         <ul className="flex space-x-8">
-          {" "}
-          {/* Aumentei o espaçamento entre as abas */}
           <li>
             <button
               onClick={() => handleNavigation("/profile")}

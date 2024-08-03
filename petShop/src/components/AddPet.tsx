@@ -11,13 +11,14 @@ interface Tutor {
 
 const AddPet: React.FC = () => {
   const [nome, setNome] = useState("");
-  const [idade, setIdade] = useState(0);
+  const [idade, setIdade] = useState<number | null>(null);
   const [porte, setPorte] = useState("");
   const [cpfTutor, setCpfTutor] = useState<{
     value: string;
     label: string;
   } | null>(null);
   const [tutors, setTutors] = useState<{ value: string; label: string }[]>([]);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,6 +45,11 @@ const AddPet: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (idade !== null && idade < 0) {
+      setErrorMessage("A idade não pode ser negativa");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
@@ -92,6 +98,17 @@ const AddPet: React.FC = () => {
     }
   };
 
+  const handleIdadeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    if (value < 0) {
+      setErrorMessage("A idade não pode ser negativa");
+      setIdade(null);
+    } else {
+      setErrorMessage("");
+      setIdade(value);
+    }
+  };
+
   return (
     <div
       className="min-h-screen flex items-center justify-center"
@@ -116,11 +133,16 @@ const AddPet: React.FC = () => {
             <input
               type="number"
               placeholder="Idade"
-              value={idade}
-              onChange={(e) => setIdade(Number(e.target.value))}
+              value={idade ?? ""}
+              onChange={handleIdadeChange}
               required
               className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479] custom-number-input"
             />
+            {errorMessage && (
+              <p className="text-sm font-bold text-red-600 mt-2">
+                {errorMessage}
+              </p>
+            )}
           </div>
           <div className="relative">
             <select
