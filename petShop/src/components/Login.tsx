@@ -19,7 +19,6 @@ const Login: React.FC = () => {
         senha,
       });
       localStorage.setItem("token", response.data.token);
-      alert("Login bem-sucedido");
       navigate("/home");
     } catch (error) {
       setErrorMessage("Email ou senha incorretos");

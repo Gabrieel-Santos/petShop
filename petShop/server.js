@@ -52,6 +52,14 @@ app.post("/register", authenticateToken, async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(senha, 10);
   try {
+    const funcionarioExistente = await prisma.funcionario.findUnique({
+      where: { email },
+    });
+
+    if (funcionarioExistente) {
+      return res.status(409).json({ message: "Email já cadastrado" });
+    }
+
     const funcionario = await prisma.funcionario.create({
       data: {
         nome,

@@ -9,6 +9,7 @@ const EditFuncionario: React.FC = () => {
     email: "",
     autoridade: 1,
   });
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,52 +48,72 @@ const EditFuncionario: React.FC = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        alert("Funcionário atualizado com sucesso");
+        setErrorMessage(""); // Limpar a mensagem de erro se a atualização for bem-sucedida
         navigate("/funcionarios");
       } catch (error) {
-        alert("Erro ao atualizar funcionário");
+        setErrorMessage("Erro ao atualizar funcionário");
       }
     }
   };
 
   return (
-    <div>
-      <h2>Editar Funcionário</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Nome:
-          <input
-            type="text"
-            name="nome"
-            value={funcionarioData.nome}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label>
-          Email:
-          <input
-            type="email"
-            name="email"
-            value={funcionarioData.email}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label>
-          Autoridade:
-          <select
-            name="autoridade"
-            value={funcionarioData.autoridade}
-            onChange={handleChange}
-            required
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{ backgroundColor: "#98D1AA" }}
+    >
+      <div className="w-full max-w-md p-8 space-y-6 bg-[#26A7C3] rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center text-white">
+          Editar Funcionário
+        </h2>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="relative">
+            <input
+              type="text"
+              name="nome"
+              value={funcionarioData.nome}
+              onChange={handleChange}
+              placeholder="Nome"
+              required
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            />
+          </div>
+          <div className="relative">
+            <input
+              type="email"
+              name="email"
+              value={funcionarioData.email}
+              onChange={handleChange}
+              placeholder="Email"
+              required
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            />
+          </div>
+          <div className="relative">
+            <select
+              name="autoridade"
+              value={funcionarioData.autoridade}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            >
+              <option value={1}>Funcionário</option>
+              <option value={2}>Administrador</option>
+            </select>
+          </div>
+          {errorMessage && (
+            <p className="text-sm font-bold text-red-600 mt-2">
+              {errorMessage}
+            </p>
+          )}
+          <button
+            type="submit"
+            className="w-full px-4 py-2 font-bold text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            style={{ backgroundColor: "#168479" }}
           >
-            <option value={1}>Funcionário</option>
-            <option value={2}>Administrador</option>
-          </select>
-        </label>
-        <button type="submit">Atualizar</button>
-      </form>
+            Atualizar
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

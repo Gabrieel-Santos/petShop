@@ -10,6 +10,7 @@ const EditTutor: React.FC = () => {
     telefone: "",
     cpf: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,60 +40,82 @@ const EditTutor: React.FC = () => {
         await axios.put(`http://localhost:5000/tutors/${id}`, tutorData, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        alert("Tutor atualizado com sucesso");
+        setErrorMessage(""); // Limpar a mensagem de erro se a atualização for bem-sucedida
         navigate("/tutors");
       } catch (error) {
-        alert("Erro ao atualizar tutor");
+        setErrorMessage("Erro ao atualizar tutor");
       }
     }
   };
 
   return (
-    <div>
-      <h2>Editar Tutor</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Nome:
-          <input
-            type="text"
-            name="nome"
-            value={tutorData.nome}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label>
-          Endereço:
-          <input
-            type="text"
-            name="endereco"
-            value={tutorData.endereco}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label>
-          Telefone:
-          <input
-            type="text"
-            name="telefone"
-            value={tutorData.telefone}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label>
-          CPF:
-          <input
-            type="text"
-            name="cpf"
-            value={tutorData.cpf}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <button type="submit">Atualizar</button>
-      </form>
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{ backgroundColor: "#98D1AA" }}
+    >
+      <div className="w-full max-w-md p-8 space-y-6 bg-[#26A7C3] rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center text-white">
+          Editar Tutor
+        </h2>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="relative">
+            <input
+              type="text"
+              name="nome"
+              value={tutorData.nome}
+              onChange={handleChange}
+              placeholder="Nome"
+              required
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            />
+          </div>
+          <div className="relative">
+            <input
+              type="text"
+              name="endereco"
+              value={tutorData.endereco}
+              onChange={handleChange}
+              placeholder="Endereço"
+              required
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            />
+          </div>
+          <div className="relative">
+            <input
+              type="text"
+              name="telefone"
+              value={tutorData.telefone}
+              onChange={handleChange}
+              placeholder="Telefone"
+              required
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            />
+          </div>
+          <div className="relative">
+            <input
+              type="text"
+              name="cpf"
+              value={tutorData.cpf}
+              onChange={handleChange}
+              placeholder="CPF"
+              required
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            />
+          </div>
+          {errorMessage && (
+            <p className="text-sm font-bold text-red-600 mt-2">
+              {errorMessage}
+            </p>
+          )}
+          <button
+            type="submit"
+            className="w-full px-4 py-2 font-bold text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            style={{ backgroundColor: "#168479" }}
+          >
+            Atualizar
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

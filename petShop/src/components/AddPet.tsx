@@ -93,39 +93,70 @@ const AddPet: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Adicionar Pet</h2>
-      <input
-        type="text"
-        placeholder="Nome"
-        value={nome}
-        onChange={(e) => setNome(e.target.value)}
-        required
-      />
-      <input
-        type="number"
-        placeholder="Idade"
-        value={idade}
-        onChange={(e) => setIdade(Number(e.target.value))}
-        required
-      />
-      <input
-        type="text"
-        placeholder="Porte"
-        value={porte}
-        onChange={(e) => setPorte(e.target.value)}
-        required
-      />
-      <Select
-        options={tutors}
-        onChange={setCpfTutor}
-        value={cpfTutor}
-        placeholder="Selecione ou digite o CPF do Tutor"
-        isClearable
-        isSearchable
-      />
-      <button type="submit">Adicionar Pet</button>
-    </form>
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{ backgroundColor: "#98D1AA" }}
+    >
+      <div className="w-full max-w-md p-8 space-y-6 bg-[#26A7C3] rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center text-white">
+          Cadastrar Pet
+        </h2>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Nome"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              required
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            />
+          </div>
+          <div className="relative">
+            <input
+              type="number"
+              placeholder="Idade"
+              value={idade}
+              onChange={(e) => setIdade(Number(e.target.value))}
+              required
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479] custom-number-input"
+            />
+          </div>
+          <div className="relative">
+            <select
+              value={porte}
+              onChange={(e) => setPorte(e.target.value)}
+              required
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            >
+              <option value="" disabled hidden>
+                Selecione o Porte
+              </option>
+              <option value="Pequeno">Pequeno</option>
+              <option value="Médio">Médio</option>
+              <option value="Grande">Grande</option>
+            </select>
+          </div>
+          <div className="relative">
+            <Select
+              options={tutors}
+              onChange={setCpfTutor}
+              value={cpfTutor}
+              placeholder="Selecione ou digite o CPF do Tutor"
+              isClearable
+              isSearchable
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full px-4 py-2 font-bold text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-[#168479]"
+            style={{ backgroundColor: "#168479" }}
+          >
+            Cadastrar Pet
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 
