@@ -82,7 +82,6 @@ const AddPet: React.FC = () => {
           },
         }
       );
-      alert("Pet adicionado com sucesso");
       navigate("/pets");
     } catch (error) {
       if (

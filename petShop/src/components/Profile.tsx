@@ -60,7 +60,7 @@ const Profile: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setErrorMessage(""); // Limpar a mensagem de erro se a atualização for bem-sucedida
+      setErrorMessage("");
       setNovaSenha("");
       setConfirmarSenha("");
       navigate("/home");

@@ -40,7 +40,7 @@ const EditTutor: React.FC = () => {
         await axios.put(`http://localhost:5000/tutors/${id}`, tutorData, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setErrorMessage(""); // Limpar a mensagem de erro se a atualização for bem-sucedida
+        setErrorMessage("");
         navigate("/tutors");
       } catch (error) {
         setErrorMessage("Erro ao atualizar tutor");
