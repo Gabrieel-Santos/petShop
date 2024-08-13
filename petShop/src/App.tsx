@@ -18,7 +18,8 @@ import Pets from "./components/Pets";
 import AddPet from "./components/AddPet";
 import EditPet from "./components/EditPet";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Navbar from "./components/Navbar"; // Ajuste o caminho conforme necessário
+import Navbar from "./components/Navbar";
+import AddService from "./components/AddService";
 
 const App: React.FC = () => {
   return (
@@ -42,6 +43,7 @@ const App: React.FC = () => {
             <Route path="/pets" element={<Pets />} />
             <Route path="/add-pet" element={<AddPet />} />
             <Route path="/edit-pet/:id" element={<EditPet />} />
+            <Route path="/add-service" element={<AddService />} />
           </Route>
         </Route>
         <Route element={<ProtectedRoute requiredRole={2} />}>

@@ -25,10 +25,28 @@ model Tutor {
 }
 
 model Pet {
-  id      Int    @id @default(autoincrement())
-  nome    String
-  idade   Int
-  porte   String
-  tutorId Int
-  tutor   Tutor  @relation(fields: [tutorId], references: [id])
+  id           Int           @id @default(autoincrement())
+  nome         String
+  idade        Int
+  porte        String
+  tutorId      Int
+  tutor        Tutor         @relation(fields: [tutorId], references: [id])
+  atendimentos Atendimento[]
+}
+
+model Servico {
+  id            Int          @id @default(autoincrement())
+  nome          String       @unique
+  valor         Float
+  tempoGasto    Int
+  Atendimento   Atendimento? @relation(fields: [atendimentoId], references: [id])
+  atendimentoId Int?
+}
+
+model Atendimento {
+  id         Int       @id @default(autoincrement())
+  data       DateTime
+  valorTotal Float
+  servicos   Servico[]
+  pets       Pet[]
 }

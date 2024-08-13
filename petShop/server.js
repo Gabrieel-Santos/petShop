@@ -458,6 +458,36 @@ app.delete("/funcionarios/:id", authenticateToken, async (req, res) => {
   }
 });
 
+// Rota para criar um novo serviço
+app.post("/services", authenticateToken, async (req, res) => {
+  const { nome, valor, tempoGasto } = req.body;
+
+  try {
+    // Verifica se o serviço já existe
+    const existingService = await prisma.servico.findUnique({
+      where: { nome },
+    });
+
+    if (existingService) {
+      return res.status(409).json({ message: "Serviço já cadastrado" });
+    }
+
+    // Cria o novo serviço
+    const service = await prisma.servico.create({
+      data: {
+        nome,
+        valor: parseFloat(valor),
+        tempoGasto: parseInt(tempoGasto, 10),
+      },
+    });
+
+    res.status(201).json(service);
+  } catch (error) {
+    console.error("Erro ao criar serviço:", error);
+    res.status(400).json({ message: "Erro ao criar serviço" });
+  }
+});
+
 app.listen(5000, () => {
   console.log("Server running on http://localhost:5000");
 });

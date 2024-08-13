@@ -36,3 +36,20 @@
 .custom-number-input {
   -moz-appearance: textfield; /* Firefox */
 }
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-container input {
+  padding-left: 2.5rem; /* Ajuste o padding-left para o espaço necessário para o símbolo "R$" */
+}
+
+.input-container .currency-symbol {
+  position: absolute;
+  left: 0.5rem; /* Ajuste o valor conforme necessário */
+  font-size: 1rem; /* Tamanho do símbolo "R$" */
+  color: #666; /* Cor do símbolo "R$" */
+}

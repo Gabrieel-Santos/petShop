@@ -45,8 +45,9 @@ const AddPet: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (idade !== null && idade < 0) {
-      setErrorMessage("A idade não pode ser negativa");
+
+    if (idade === null || idade <= 0) {
+      setErrorMessage("A idade deve ser maior que zero");
       return;
     }
 
@@ -99,8 +100,8 @@ const AddPet: React.FC = () => {
 
   const handleIdadeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
-    if (value < 0) {
-      setErrorMessage("A idade não pode ser negativa");
+    if (value <= 0) {
+      setErrorMessage("A idade deve ser maior que zero");
       setIdade(null);
     } else {
       setErrorMessage("");
@@ -137,11 +138,6 @@ const AddPet: React.FC = () => {
               required
               className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479] custom-number-input"
             />
-            {errorMessage && (
-              <p className="text-sm font-bold text-red-600 mt-2">
-                {errorMessage}
-              </p>
-            )}
           </div>
           <div className="relative">
             <select
@@ -168,6 +164,11 @@ const AddPet: React.FC = () => {
               isSearchable
             />
           </div>
+          {errorMessage && (
+            <p className="text-sm font-bold text-red-600 mt-2 text-center">
+              {errorMessage}
+            </p>
+          )}
           <button
             type="submit"
             className="w-full px-4 py-2 font-bold text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-[#168479]"

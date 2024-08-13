@@ -49,8 +49,8 @@ const EditPet: React.FC = () => {
 
   const handleIdadeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
-    if (value < 0) {
-      setErrorMessage("A idade não pode ser negativa");
+    if (value <= 0) {
+      setErrorMessage("A idade deve ser maior que zero");
       setPetData({ ...petData, idade: 0 });
     } else {
       setErrorMessage("");
@@ -60,8 +60,8 @@ const EditPet: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (petData.idade < 0) {
-      setErrorMessage("A idade não pode ser negativa");
+    if (petData.idade <= 0) {
+      setErrorMessage("A idade deve ser maior que zero");
       return;
     }
     const token = localStorage.getItem("token");
@@ -114,11 +114,6 @@ const EditPet: React.FC = () => {
               required
               className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479] custom-number-input"
             />
-            {errorMessage && (
-              <p className="text-sm font-bold text-red-600 mt-2">
-                {errorMessage}
-              </p>
-            )}
           </div>
           <div className="relative">
             <select
@@ -146,7 +141,7 @@ const EditPet: React.FC = () => {
             />
           </div>
           {errorMessage && (
-            <p className="text-sm font-bold text-red-600 mt-2">
+            <p className="text-sm font-bold text-red-600 mt-2 text-center">
               {errorMessage}
             </p>
           )}
