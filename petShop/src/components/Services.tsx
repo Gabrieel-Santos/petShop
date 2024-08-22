@@ -174,7 +174,7 @@ const Services: React.FC = () => {
                 <td className="py-2 px-4">{service.nome}</td>
                 <td className="py-2 px-4">R$ {service.valor.toFixed(2)}</td>
                 <td className="py-2 px-4">{service.tempoGasto}</td>
-                <td className="py-2 px-4 w-16 flex justify-around items-center">
+                <td className="py-2 px-4 w-32 flex justify-around items-center">
                   <button
                     onClick={() => handleEdit(service.id)}
                     className="text-blue-300 hover:text-blue-500 text-lg mx-2"

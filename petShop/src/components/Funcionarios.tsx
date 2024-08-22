@@ -164,7 +164,7 @@ const Funcionarios: React.FC = () => {
             >
               <td className="py-2 px-4">{funcionario.nome}</td>
               <td className="py-2 px-4">{funcionario.email}</td>
-              <td className="py-2 px-4 w-16 flex justify-around items-center">
+              <td className="py-2 px-4 w-32 flex justify-around items-center">
                 <button
                   onClick={() => handleEdit(funcionario.id)}
                   className="text-blue-300 hover:text-blue-500 text-lg mx-2"

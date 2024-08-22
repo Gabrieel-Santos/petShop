@@ -634,14 +634,14 @@ app.get("/atendimentos", authenticateToken, async (req, res) => {
   try {
     const atendimentos = await prisma.atendimento.findMany({
       orderBy: {
-        data: "desc", // Ordena pela data em ordem decrescente (mais recente primeiro)
+        data: "desc",
       },
-      skip: parseInt(skip), // Aplica a paginação após a ordenação correta
+      skip: parseInt(skip),
       take: parseInt(limit),
       include: {
         pets: {
           include: {
-            tutor: true, // Inclui o tutor do pet
+            tutor: true,
           },
         },
       },
