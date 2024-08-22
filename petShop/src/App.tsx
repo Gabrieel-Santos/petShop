@@ -20,6 +20,10 @@ import EditPet from "./components/EditPet";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 import AddService from "./components/AddService";
+import EditService from "./components/EditService";
+import Services from "./components/Services";
+import AddAtendimento from "./components/AddAtendimento";
+import EditAtendimento from "./components/EditAtendimento";
 
 const App: React.FC = () => {
   return (
@@ -36,6 +40,8 @@ const App: React.FC = () => {
             }
           >
             <Route path="/home" element={<Home />} />
+            <Route path="/add-atendimento" element={<AddAtendimento />} />
+            <Route path="/edit-atendimento/:id" element={<EditAtendimento />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/tutors" element={<Tutors />} />
             <Route path="/add-tutor" element={<AddTutor />} />
@@ -43,7 +49,9 @@ const App: React.FC = () => {
             <Route path="/pets" element={<Pets />} />
             <Route path="/add-pet" element={<AddPet />} />
             <Route path="/edit-pet/:id" element={<EditPet />} />
+            <Route path="/services" element={<Services />} />
             <Route path="/add-service" element={<AddService />} />
+            <Route path="/edit-service/:id" element={<EditService />} />
           </Route>
         </Route>
         <Route element={<ProtectedRoute requiredRole={2} />}>

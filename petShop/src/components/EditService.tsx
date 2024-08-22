@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
-const AddService: React.FC = () => {
+const EditService: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const [serviceData, setServiceData] = useState({
     nome: "",
     valor: "",
@@ -10,6 +11,35 @@ const AddService: React.FC = () => {
   });
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchServiceData = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const response = await axios.get(
+            `http://localhost:5000/services/${id}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          if (response.status === 200) {
+            const service = response.data;
+            setServiceData({
+              nome: service.nome,
+              valor: service.valor.toString(),
+              tempoGasto: service.tempoGasto.toString(),
+            });
+          }
+        } catch (error) {
+          console.error("Erro ao buscar dados do serviço:", error);
+          alert("Erro ao buscar dados do serviço");
+        }
+      }
+    };
+
+    fetchServiceData();
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,32 +65,25 @@ const AddService: React.FC = () => {
       return;
     }
 
-    try {
-      const token = localStorage.getItem("token");
-
-      await axios.post(
-        "http://localhost:5000/services",
-        {
-          nome: serviceData.nome,
-          valor: valor,
-          tempoGasto: tempoGasto,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setServiceData({ nome: "", valor: "", tempoGasto: "" });
-      setErrorMessage("");
-      navigate("/services");
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        if (error.response.status === 409) {
-          setErrorMessage("Serviço já cadastrado");
-        } else {
-          setErrorMessage("Erro ao adicionar serviço");
-        }
-      } else {
-        setErrorMessage("Erro ao adicionar serviço");
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        await axios.put(
+          `http://localhost:5000/services/${id}`,
+          {
+            nome: serviceData.nome,
+            valor: valor,
+            tempoGasto: tempoGasto,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setErrorMessage("");
+        navigate("/services");
+      } catch (error) {
+        console.error("Erro ao atualizar serviço:", error);
+        setErrorMessage("Erro ao atualizar serviço");
       }
     }
   };
@@ -72,7 +95,7 @@ const AddService: React.FC = () => {
     >
       <div className="w-full max-w-md p-8 space-y-6 bg-[#26A7C3] rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center text-white">
-          Cadastrar Serviço
+          Editar Serviço
         </h2>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="relative">
@@ -126,7 +149,7 @@ const AddService: React.FC = () => {
             className="w-full px-4 py-2 font-bold text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-[#168479]"
             style={{ backgroundColor: "#168479" }}
           >
-            Cadastrar
+            Atualizar
           </button>
         </form>
       </div>
@@ -134,4 +157,4 @@ const AddService: React.FC = () => {
   );
 };
 
-export default AddService;
+export default EditService;

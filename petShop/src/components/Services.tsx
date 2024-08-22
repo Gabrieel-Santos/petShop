@@ -11,122 +11,113 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Modal from "react-modal";
 
-interface Pet {
-  nome: string;
-  tutor: {
-    nome: string;
-  };
-}
-
-interface Atendimento {
+interface Service {
   id: number;
-  data: string;
-  valorTotal: number;
-  pets: Pet[];
+  nome: string;
+  valor: number;
+  tempoGasto: number;
 }
 
-const Home: React.FC = () => {
-  const [atendimentos, setAtendimentos] = useState<Atendimento[]>([]);
-  const [searchTutor, setSearchTutor] = useState("");
+const Services: React.FC = () => {
+  const [services, setServices] = useState<Service[]>([]);
+  const [searchName, setSearchName] = useState("");
   const [page, setPage] = useState(1);
-  const [totalAtendimentos, setTotalAtendimentos] = useState(0);
+  const [totalServices, setTotalServices] = useState(0);
   const [limit] = useState(5);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [atendimentoToDelete, setAtendimentoToDelete] = useState<number | null>(
-    null
-  );
+  const [serviceToDelete, setServiceToDelete] = useState<number | null>(null);
   const navigate = useNavigate();
 
-  const fetchAtendimentos = useCallback(async () => {
+  const fetchServices = useCallback(async () => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const response = await axios.get("http://localhost:5000/atendimentos", {
+        const response = await axios.get("http://localhost:5000/services", {
           headers: { Authorization: `Bearer ${token}` },
           params: { page, limit },
         });
-        setAtendimentos(response.data.atendimentos || []);
-        setTotalAtendimentos(response.data.totalAtendimentos || 0);
+        setServices(response.data.services || []);
+        setTotalServices(response.data.totalServices || 0);
       } catch (error) {
-        console.error("Erro ao buscar atendimentos:", error);
-        setAtendimentos([]);
-        setTotalAtendimentos(0);
+        console.error("Erro ao buscar serviços:", error);
+        setServices([]);
+        setTotalServices(0);
       }
     }
   }, [page, limit]);
 
   useEffect(() => {
-    fetchAtendimentos();
-  }, [fetchAtendimentos]);
+    fetchServices();
+  }, [fetchServices]);
 
   const handleEdit = (id: number) => {
-    navigate(`/edit-atendimento/${id}`);
+    navigate(`/edit-service/${id}`);
   };
 
   const openModal = (id: number) => {
-    setAtendimentoToDelete(id);
+    setServiceToDelete(id);
     setModalIsOpen(true);
   };
 
   const closeModal = () => {
     setModalIsOpen(false);
-    setAtendimentoToDelete(null);
+    setServiceToDelete(null);
   };
 
   const handleDelete = async () => {
-    if (atendimentoToDelete !== null) {
+    if (serviceToDelete !== null) {
       const token = localStorage.getItem("token");
       if (token) {
         try {
           await axios.delete(
-            `http://localhost:5000/atendimentos/${atendimentoToDelete}`,
+            `http://localhost:5000/services/${serviceToDelete}`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
           );
-          fetchAtendimentos();
+          fetchServices();
           closeModal();
         } catch (error) {
-          alert("Erro ao excluir atendimento");
+          alert("Erro ao excluir serviço");
           closeModal();
         }
       }
     }
   };
 
+  const handleAddService = () => {
+    navigate("/add-service");
+  };
+
   const handleSearch = async (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-    if (token && searchTutor) {
+    if (token && searchName) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/atendimentos/tutor/${searchTutor}`,
+          `http://localhost:5000/services/nome/${searchName}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setAtendimentos(response.data || []);
+        setServices(response.data || []);
       } catch (error) {
-        alert("Erro ao buscar atendimentos pelo tutor");
-        setAtendimentos([]);
+        alert("Erro ao buscar serviço");
+        setServices([]);
       }
     }
   };
 
   const handleClearSearch = () => {
-    setSearchTutor("");
-    fetchAtendimentos();
+    setSearchName("");
+    fetchServices();
   };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
 
-  const handleAddAtendimento = () => {
-    navigate("/add-atendimento");
-  };
-
-  const totalPages = Math.ceil(totalAtendimentos / limit);
+  const totalPages = Math.ceil(totalServices / limit);
 
   return (
     <div
@@ -137,9 +128,9 @@ const Home: React.FC = () => {
         <form onSubmit={handleSearch} className="flex-grow relative">
           <input
             type="text"
-            placeholder="Buscar por nome do tutor"
-            value={searchTutor}
-            onChange={(e) => setSearchTutor(e.target.value)}
+            placeholder="Buscar por nome do serviço"
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
             className="w-full pl-10 pr-10 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#168479]"
           />
           <FontAwesomeIcon
@@ -163,70 +154,45 @@ const Home: React.FC = () => {
       <table className="mt-4 w-full max-w-4xl bg-[#168479] rounded-md shadow-md">
         <thead>
           <tr>
-            <th className="py-2 px-4 text-left text-white">Data</th>
-            <th className="py-2 px-4 text-left text-white">Tutor</th>
-            <th className="py-2 px-4 text-left text-white">Pet</th>
-            <th className="py-2 px-4 text-left text-white">Valor Total</th>
+            <th className="py-2 px-4 text-left text-white">Nome do Serviço</th>
+            <th className="py-2 px-4 text-left text-white">Valor</th>
+            <th className="py-2 px-4 text-left text-white">
+              Tempo Gasto (min)
+            </th>
             <th className="py-2 px-4 text-left text-white w-16 text-center">
               <FontAwesomeIcon icon={faEllipsisV} />
             </th>
           </tr>
         </thead>
         <tbody>
-          {atendimentos.length > 0 ? (
-            // Reverte a ordem dos atendimentos para garantir que os mais recentes apareçam no topo
-            atendimentos
-              .slice()
-              .reverse()
-              .map((atendimento) => (
-                <tr
-                  key={atendimento.id}
-                  className="border-t border-gray-400 text-white"
-                >
-                  <td className="py-2 px-4">
-                    {new Date(atendimento.data).toLocaleDateString("pt-BR", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </td>
-                  <td className="py-2 px-4">
-                    {atendimento.pets.length > 0
-                      ? atendimento.pets
-                          .map((pet) => pet.tutor?.nome)
-                          .filter(Boolean)
-                          .join(", ")
-                      : "Tutor não encontrado"}
-                  </td>
-                  <td className="py-2 px-4">
-                    {atendimento.pets.length > 0
-                      ? atendimento.pets.map((pet) => pet.nome).join(", ")
-                      : "Pet não encontrado"}
-                  </td>
-                  <td className="py-2 px-4">
-                    R$ {atendimento.valorTotal.toFixed(2)}
-                  </td>
-                  <td className="py-2 px-4 w-16 flex justify-around items-center">
-                    <button
-                      onClick={() => handleEdit(atendimento.id)}
-                      className="text-blue-300 hover:text-blue-500 text-lg mx-2"
-                    >
-                      <FontAwesomeIcon icon={faEdit} />
-                    </button>
-                    <button
-                      onClick={() => openModal(atendimento.id)}
-                      className="text-red-300 hover:text-red-500 text-lg mx-2 mr-4"
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </td>
-                </tr>
-              ))
+          {services.length > 0 ? (
+            services.map((service) => (
+              <tr
+                key={service.id}
+                className="border-t border-gray-400 text-white"
+              >
+                <td className="py-2 px-4">{service.nome}</td>
+                <td className="py-2 px-4">R$ {service.valor.toFixed(2)}</td>
+                <td className="py-2 px-4">{service.tempoGasto}</td>
+                <td className="py-2 px-4 w-16 flex justify-around items-center">
+                  <button
+                    onClick={() => handleEdit(service.id)}
+                    className="text-blue-300 hover:text-blue-500 text-lg mx-2"
+                  >
+                    <FontAwesomeIcon icon={faEdit} />
+                  </button>
+                  <button
+                    onClick={() => openModal(service.id)}
+                    className="text-red-300 hover:text-red-500 text-lg mx-2 mr-4"
+                  >
+                    <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                </td>
+              </tr>
+            ))
           ) : (
             <tr>
-              <td colSpan={5}>Nenhum atendimento encontrado</td>
+              <td colSpan={4}>Nenhum serviço encontrado</td>
             </tr>
           )}
         </tbody>
@@ -253,11 +219,11 @@ const Home: React.FC = () => {
         </button>
       </div>
       <button
-        onClick={handleAddAtendimento}
+        onClick={handleAddService}
         className="mt-4 px-4 py-2 font-bold text-white rounded-md"
         style={{ backgroundColor: "#168479" }}
       >
-        Cadastrar Atendimento
+        Cadastrar Serviço
       </button>
 
       <Modal
@@ -268,7 +234,7 @@ const Home: React.FC = () => {
         overlayClassName="modal-overlay"
       >
         <h2 className="text-lg font-bold mb-4">Confirmação de Exclusão</h2>
-        <p>Tem certeza que deseja excluir este atendimento?</p>
+        <p>Tem certeza que deseja excluir este serviço?</p>
         <div className="flex justify-end mt-4">
           <button
             onClick={closeModal}
@@ -288,4 +254,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default Services;

@@ -488,6 +488,281 @@ app.post("/services", authenticateToken, async (req, res) => {
   }
 });
 
+// Rota para listar serviços com paginação
+app.get("/services", authenticateToken, async (req, res) => {
+  const { page = 1, limit = 5 } = req.query;
+  const skip = (page - 1) * limit;
+
+  try {
+    const services = await prisma.servico.findMany({
+      skip: parseInt(skip),
+      take: parseInt(limit),
+    });
+    const totalServices = await prisma.servico.count();
+    res.json({ services, totalServices });
+  } catch (error) {
+    console.error("Erro ao listar serviços:", error);
+    res.status(400).json({ message: "Erro ao listar serviços" });
+  }
+});
+
+// Rota para buscar serviço pelo nome
+app.get("/services/nome/:nome", authenticateToken, async (req, res) => {
+  const { nome } = req.params;
+
+  try {
+    const services = await prisma.servico.findMany({
+      where: {
+        nome: {
+          contains: nome, // Permite busca parcial pelo nome
+        },
+      },
+    });
+    res.json(services);
+  } catch (error) {
+    console.error("Erro ao buscar serviço:", error);
+    res.status(400).json({ message: "Erro ao buscar serviço" });
+  }
+});
+
+// Rota para obter um serviço pelo ID
+app.get("/services/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const service = await prisma.servico.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!service) {
+      return res.status(404).json({ message: "Serviço não encontrado" });
+    }
+
+    res.json(service);
+  } catch (error) {
+    console.error("Erro ao obter serviço:", error);
+    res.status(400).json({ message: "Erro ao obter serviço" });
+  }
+});
+
+// Rota para atualizar um serviço pelo ID
+app.put("/services/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { nome, valor, tempoGasto } = req.body;
+
+  try {
+    const service = await prisma.servico.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!service) {
+      return res.status(404).json({ message: "Serviço não encontrado" });
+    }
+
+    const updatedService = await prisma.servico.update({
+      where: { id: parseInt(id) },
+      data: {
+        nome,
+        valor: parseFloat(valor),
+        tempoGasto: parseInt(tempoGasto, 10),
+      },
+    });
+
+    res.json(updatedService);
+  } catch (error) {
+    console.error("Erro ao atualizar serviço:", error);
+    res.status(400).json({ message: "Erro ao atualizar serviço" });
+  }
+});
+
+// Rota para excluir um serviço pelo ID
+app.delete("/services/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const service = await prisma.servico.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!service) {
+      return res.status(404).json({ message: "Serviço não encontrado" });
+    }
+
+    await prisma.servico.delete({
+      where: { id: parseInt(id) },
+    });
+
+    res.json({ message: "Serviço excluído com sucesso" });
+  } catch (error) {
+    console.error("Erro ao excluir serviço:", error);
+    res.status(400).json({ message: "Erro ao excluir serviço" });
+  }
+});
+
+// Rota para criar um atendimento
+app.post("/atendimentos", authenticateToken, async (req, res) => {
+  const { data, valorTotal, petId, servicos } = req.body;
+
+  try {
+    // Cria o atendimento associando um único pet e múltiplos serviços
+    const atendimento = await prisma.atendimento.create({
+      data: {
+        data: new Date(data), // Converte a string de data para objeto Date
+        valorTotal,
+        pets: {
+          connect: { id: petId }, // Conecta apenas um pet pelo ID
+        },
+        servicos: {
+          connect: servicos.map((servicoId) => ({ id: servicoId })), // Conecta múltiplos serviços pelo ID
+        },
+      },
+    });
+
+    // Retorna o atendimento criado
+    res.status(201).json(atendimento);
+  } catch (error) {
+    console.error("Erro ao criar atendimento:", error);
+    res.status(500).json({ message: "Erro ao criar atendimento" });
+  }
+});
+
+// Rota para listar atendimentos com paginação e ordenação por data
+app.get("/atendimentos", authenticateToken, async (req, res) => {
+  const { page = 1, limit = 5 } = req.query;
+  const skip = (page - 1) * limit;
+
+  try {
+    const atendimentos = await prisma.atendimento.findMany({
+      orderBy: {
+        data: "desc", // Ordena pela data em ordem decrescente (mais recente primeiro)
+      },
+      skip: parseInt(skip), // Aplica a paginação após a ordenação correta
+      take: parseInt(limit),
+      include: {
+        pets: {
+          include: {
+            tutor: true, // Inclui o tutor do pet
+          },
+        },
+      },
+    });
+
+    const totalAtendimentos = await prisma.atendimento.count();
+
+    res.json({
+      atendimentos,
+      totalAtendimentos,
+    });
+  } catch (error) {
+    console.error("Erro ao buscar atendimentos:", error);
+    res.status(500).json({ message: "Erro ao buscar atendimentos" });
+  }
+});
+
+// Rota para buscar pelo nome do tutor
+app.get("/atendimentos/tutor/:nome", authenticateToken, async (req, res) => {
+  const { nome } = req.params;
+
+  try {
+    const atendimentos = await prisma.atendimento.findMany({
+      where: {
+        pets: {
+          some: {
+            tutor: {
+              nome: {
+                contains: nome, // Remova o 'mode' pois não é suportado no SQLite
+              },
+            },
+          },
+        },
+      },
+      include: {
+        pets: {
+          include: {
+            tutor: true, // Inclui o tutor do pet
+          },
+        },
+      },
+    });
+
+    res.json(atendimentos);
+  } catch (error) {
+    console.error("Erro ao buscar atendimentos por tutor:", error);
+    res.status(500).json({ message: "Erro ao buscar atendimentos por tutor" });
+  }
+});
+
+// Rota para obter um atendimento pelo ID
+app.get("/atendimentos/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const atendimento = await prisma.atendimento.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        pets: {
+          include: {
+            tutor: true, // Inclui o tutor do pet
+          },
+        },
+        servicos: true, // Inclui os serviços associados ao atendimento
+      },
+    });
+
+    if (!atendimento) {
+      return res.status(404).json({ message: "Atendimento não encontrado" });
+    }
+
+    res.json(atendimento);
+  } catch (error) {
+    console.error("Erro ao buscar atendimento por ID:", error);
+    res.status(400).json({ message: "Erro ao buscar atendimento por ID" });
+  }
+});
+
+// Rota para atualizar um atendimento pelo ID
+app.put("/atendimentos/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { data, valorTotal, petId, servicos } = req.body;
+
+  try {
+    // Atualiza o atendimento, associando os novos pets e serviços
+    const updatedAtendimento = await prisma.atendimento.update({
+      where: { id: parseInt(id) },
+      data: {
+        data: new Date(data), // Converte a string de data para objeto Date
+        valorTotal,
+        pets: {
+          set: [{ id: petId }], // Substitui os pets associados pelo novo pet
+        },
+        servicos: {
+          set: servicos.map((servicoId) => ({ id: servicoId })), // Substitui os serviços associados pelos novos serviços
+        },
+      },
+    });
+
+    res.json(updatedAtendimento);
+  } catch (error) {
+    console.error("Erro ao atualizar atendimento:", error);
+    res.status(500).json({ message: "Erro ao atualizar atendimento" });
+  }
+});
+
+// Rota para excluir um atendimento pelo ID
+app.delete("/atendimentos/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await prisma.atendimento.delete({
+      where: { id: parseInt(id) },
+    });
+    res.json({ message: "Atendimento excluído com sucesso" });
+  } catch (error) {
+    console.error("Erro ao excluir atendimento:", error);
+    res.status(500).json({ message: "Erro ao excluir atendimento" });
+  }
+});
+
 app.listen(5000, () => {
   console.log("Server running on http://localhost:5000");
 });

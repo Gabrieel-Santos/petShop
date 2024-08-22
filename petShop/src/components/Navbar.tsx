@@ -82,6 +82,16 @@ const Navbar: React.FC = () => {
           </li>
           <li>
             <button
+              onClick={() => handleNavigation("/services")}
+              className={classNames("font-bold hover:text-[#26A7C3]", {
+                "text-[#26A7C3]": location.pathname === "/services",
+              })}
+            >
+              SERVIÇOS
+            </button>
+          </li>
+          <li>
+            <button
               onClick={handleLogout}
               className="font-bold hover:text-[#f02849]"
             >
